@@ -141,13 +141,13 @@ def neural_network0(x_train, y_train, *args, **kwargs):
       y_test=None
   
   model = keras.Sequential([
-      keras.layers.Dense(128, activation='relu'),
-      keras.layers.Dense(128, activation='relu'),
-      keras.layers.Dense(1),]) 
+      keras.layers.Dense(16, activation='relu'),
+      keras.layers.Dense(8, activation='relu'),
+      keras.layers.Dense(1, activation='linear')]) 
   model.compile(optimizer=tf.keras.optimizers.Adam(0.001),
                 loss='mean_squared_error',
-                metrics=['accuracy'])
-  model.fit(x_train, y_train, epochs=150)
+                metrics=tf.keras.metrics.RootMeanSquaredError())
+  model.fit(x_train, y_train, epochs=20)
   predictions = model.predict(x_test)
   test_loss, test_acc = None, None
   if (y_test is not None and x_test is not None):
@@ -188,4 +188,4 @@ test_submission = pd.DataFrame({
     "Horizontal_Distance_To_Fire_Points" : np.array(predictions).flatten(),
 })
 
-test_submission.to_csv('nn_submission_v4.csv', index=False)
+test_submission.to_csv('nn_submission_v5.csv', index=False)
