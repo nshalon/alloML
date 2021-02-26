@@ -12,6 +12,7 @@ from sklearn.linear_model import Ridge
 import pathlib as pl
 import tensorflow as tf
 from tensorflow import keras
+import os
 
 
 # Perform the major preprocessing of the data, function
@@ -140,14 +141,27 @@ def neural_network0(x_train, y_train, *args, **kwargs):
   except KeyError:
       y_test=None
   
+  # CP_PATH = pl.Path.joinpath(pl.Path.cwd(), 'cp.mat')
+
   model = keras.Sequential([
-      keras.layers.Dense(16, activation='relu'),
-      keras.layers.Dense(8, activation='relu'),
-      keras.layers.Dense(1, activation='linear')]) 
+       keras.layers.Dense(256, activation='relu'),
+       keras.layers.Dropout(0.2),
+       keras.layers.Dense(256, activation='relu'),
+       keras.layers.Dropout(0.2),
+       keras.layers.Dense(256, activation='relu'),
+       keras.layers.Dropout(0.2),
+       keras.layers.Dense(1, activation='linear')])
   model.compile(optimizer=tf.keras.optimizers.Adam(0.001),
                 loss='mean_squared_error',
                 metrics=tf.keras.metrics.RootMeanSquaredError())
-  model.fit(x_train, y_train, epochs=20)
+  # model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+  #   filepath=CP_PATH,
+  #   save_weights_only=True,
+  #   monitor='val_accuracy',
+  #   mode='max',
+  #   save_best_only=True)
+  model.fit(x_train, y_train, epochs=4000)
+  # model.load_weights(CP_PATH)
   predictions = model.predict(x_test)
   test_loss, test_acc = None, None
   if (y_test is not None and x_test is not None):
@@ -188,4 +202,4 @@ test_submission = pd.DataFrame({
     "Horizontal_Distance_To_Fire_Points" : np.array(predictions).flatten(),
 })
 
-test_submission.to_csv('nn_submission_v5.csv', index=False)
+test_submission.to_csv('nn_submission_v6.csv', index=False)
